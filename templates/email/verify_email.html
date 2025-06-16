@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-postanızı Doğrulayın</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 20px 0;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Merhaba {{ username }},</h2>
+        <p>Proje Yönetim Sistemi'ne kaydolduğunuz için teşekkür ederiz! E-posta adresinizi doğrulamak ve hesabınızı etkinleştirmek için lütfen aşağıdaki düğmeye tıklayın:</p>
+        <a href="{{ verification_url }}" class="button" style="color: #ffffff !important;">E-posta Adresini Doğrula</a>
+        <p>Düğmeye tıklayamıyorsanız, lütfen aşağıdaki bağlantıyı kopyalayıp tarayıcınıza yapıştırın:</p>
+        <p><a href="{{ verification_url }}">{{ verification_url }}</a></p>
+        <p>Proje Yönetim Sistemi için bir hesap açmadıysanız, bu e-postayı güvenle yok sayabilirsiniz.</p>
+        <p>Teşekkürler,<br>Proje Yönetim Sistemi Ekibi</p>
+    </div>
+</body>
+</html> 
