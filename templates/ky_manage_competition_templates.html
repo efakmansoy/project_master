@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Yarışma Şablonlarını Yönet - Kurum Yöneticisi Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Oluşturduğum Yarışma Şablonları</h1>
+    <p>Bu sayfada kendi oluşturduğunuz yarışma/proje tipi şablonlarını görebilirsiniz.</p>
+
+    <div class="mb-3">
+        <a href="{{ url_for('ky_add_competition_template') }}" class="btn btn-success"><i class="fas fa-plus"></i> Yeni Yarışma Şablonu Ekle</a>
+    </div>
+
+    {% if templates %}
+    <div class="accordion" id="templatesAccordion">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Adı</th>
+                    <th>MEB İzni Gerekli</th>
+                    <th>Oluşturulma Tarihi</th>
+                    <th>Konular</th>
+                    <th>Alt Temalar</th>
+                    <th>Tanımlı Tarihler</th>
+                    <th>Tanımlı Dökümanlar</th>
+                    <th>Eylemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for template in templates %}
+                <tr>
+                    <td>{{ template.id }}</td>
+                    <td>{{ template.name }}</td>
+                    <td>{{ 'Evet' if template.requires_meg_approval else 'Hayır' }}</td>
+                    <td>{{ template.created_at.strftime('%d-%m-%Y %H:%M') if template.created_at else '-' }}</td>
+                    <td>
+                        {% if template.topics %}
+                            <ul>{% for topic in template.topics %}<li>{{ topic }}</li>{% endfor %}</ul>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if template.common_themes %}
+                            <ul>{% for theme in template.common_themes %}<li>{{ theme }}</li>{% endfor %}</ul>
+                        {% else %}
+                             <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if template.defined_dates %}
+                            <ul>
+                            {% for date_entry in template.defined_dates %}
+                                <li>{{ date_entry.name }}: {{ date_entry.date.strftime('%d-%m-%Y') }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted">Yok</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if template.defined_documents %}
+                            <ul>
+                            {% for doc in template.defined_documents %}
+                                <li>
+                                    <a href="{{ url_for('serve_competition_template_document', template_id=template.id, filename=doc.filename) }}" target="_blank">
+                                        <i class="fas fa-file-alt"></i> {{ doc.display_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="text-muted">Yok</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ url_for('ky_edit_competition_template', template_id=template.id) }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-edit"></i> Düzenle
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Henüz hiç yarışma şablonu oluşturmadınız. <a href="{{ url_for('ky_add_competition_template') }}" class="alert-link">Şimdi bir tane ekleyin!</a>
+    </div>
+    {% endif %}
+
+    <p class="mt-4">
+        <a href="{{ url_for('kurum_yoneticisi_panel') }}" class="btn btn-secondary">&larr; Kurum Yöneticisi Paneline Dön</a>
+    </p>
+</div>
+{% endblock %} 

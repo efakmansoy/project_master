@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Proje Yönetim Sistemine Hoş Geldiniz{% endblock %}
+
+{% block content %}
+<div class="welcome-container">
+    <h1>Proje Yönetim Sistemine Hoş Geldiniz!</h1>
+    <p>Projelerinizi verimli ve işbirlikçi bir şekilde yönetmek için nihai çözümünüz.</p>
+    
+    <div class="features-overview">
+        <h2>Temel Özellikler:</h2>
+        <ul>
+            <li>Proje ilerlemesini kolaylıkla takip edin.</li>
+            <li>Proje dosyalarını ve görsellerini yükleyin ve yönetin.</li>
+            <li>Takımınızla işbirliği yapın (Öğrenci & Öğretmen rolleri).</li>
+            <li>Proje zaman çizelgelerini ve önemli kilometre taşlarını görüntüleyin.</li>
+        </ul>
+    </div>
+
+    <p>Kontrol panelinize erişmek için lütfen <a href="{{ url_for('login') }}">giriş yapın</a> veya henüz bir hesabınız yoksa <a href="{{ url_for('signup') }}">kayıt olun</a>.</p>
+    
+    <div class="cta-buttons">
+        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Giriş Yap</a>
+        <a href="{{ url_for('signup') }}" class="btn btn-secondary btn-lg">Kayıt Ol</a>
+    </div>
+</div>
+{% endblock %} 

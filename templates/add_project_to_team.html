@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} Takımına Proje Ekle - Proje Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Takıma Yeni Proje Ekle: {{ team.name }}</h2>
+    <form method="POST" action="{{ url_for('add_project_to_team_route', team_id=team.id) }}">
+        <div class="form-group">
+            <label for="project_name">Proje Adı <span class="text-danger">*</span></label>
+            <input type="text" id="project_name" name="project_name" class="form-control" value="{{ form_data.project_name if form_data else '' }}" required>
+        </div>
+        <div class="form-group">
+            <label for="project_description">Proje Açıklaması <span class="text-danger">*</span></label>
+            <textarea id="project_description" name="project_description" class="form-control" rows="5" required>{{ form_data.project_description if form_data else '' }}</textarea>
+        </div>
+
+        {% if templates %}
+        <div class="form-group">
+            <label for="competition_template_id">Yarışma Şablonu <span class="text-danger">*</span></label>
+            <select id="competition_template_id" name="competition_template_id" class="form-control" required>
+                <option value="">-- Şablon Seçiniz --</option>
+                {% for template in templates %}
+                    <option value="{{ template.id }}" {% if form_data and form_data.competition_template_id|int == template.id %}selected{% endif %}>{{ template.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="form-text text-muted">Bir yarışma şablonu seçmeniz zorunludur.</small>
+        </div>
+
+        <div class="form-group" id="main_topic_group" style="display: none;">
+            <label for="main_topic">Ana Konu (Şablondan)</label>
+            <select id="main_topic" name="main_topic" class="form-control">
+                <option value="">-- Ana Konu Seçiniz (Opsiyonel) --</option>
+            </select>
+        </div>
+
+        <div class="form-group" id="common_sub_theme_group" style="display: none;">
+            <label for="common_sub_theme">Alt Tema (Şablondan)</label>
+            <select id="common_sub_theme" name="common_sub_theme" class="form-control">
+                <option value="">-- Alt Tema Seçiniz (Opsiyonel) --</option>
+            </select>
+        </div>
+        {% else %}
+            <div class="alert alert-warning" role="alert">
+                Proje eklemek için uygun bir yarışma şablonu bulunmamaktadır. Lütfen bir Kurum Yöneticisi veya Admin ile iletişime geçin.
+            </div>
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary btn-block" {% if not templates %}disabled{% endif %}>Proje Ekle</button>
+    </form>
+    <p class="mt-3 text-center">
+        <a href="{{ url_for('dashboard') }}">Kontrol Paneline Geri Dön</a>
+    </p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const templatesData = JSON.parse('{{ templates_with_details_json | safe }}');
+    const templateSelect = document.getElementById('competition_template_id');
+    const mainTopicGroup = document.getElementById('main_topic_group');
+    const mainTopicSelect = document.getElementById('main_topic');
+    const commonSubThemeGroup = document.getElementById('common_sub_theme_group');
+    const commonSubThemeSelect = document.getElementById('common_sub_theme');
+
+    const selectedMainTopicValue = "{{ form_data.main_topic if form_data else '' }}";
+    const selectedCommonThemeValue = "{{ form_data.common_sub_theme if form_data else '' }}";
+
+    function populateSubDropdowns() {
+        const selectedTemplateId = templateSelect.value;
+        
+        // Clear previous options
+        mainTopicSelect.innerHTML = '<option value="">-- Ana Konu Seçiniz (Opsiyonel) --</option>';
+        commonSubThemeSelect.innerHTML = '<option value="">-- Alt Tema Seçiniz (Opsiyonel) --</option>';
+
+        if (selectedTemplateId && templatesData[selectedTemplateId]) {
+            const details = templatesData[selectedTemplateId];
+
+            if (details.topics && details.topics.length > 0) {
+                details.topics.forEach(topic => {
+                    const option = new Option(topic, topic);
+                    if (topic === selectedMainTopicValue) option.selected = true;
+                    mainTopicSelect.add(option);
+                });
+                mainTopicGroup.style.display = 'block';
+            } else {
+                mainTopicGroup.style.display = 'none';
+            }
+
+            if (details.common_themes && details.common_themes.length > 0) {
+                details.common_themes.forEach(theme => {
+                    const option = new Option(theme, theme);
+                    if (theme === selectedCommonThemeValue) option.selected = true;
+                    commonSubThemeSelect.add(option);
+                });
+                commonSubThemeGroup.style.display = 'block';
+            } else {
+                commonSubThemeGroup.style.display = 'none';
+            }
+        } else {
+            mainTopicGroup.style.display = 'none';
+            commonSubThemeGroup.style.display = 'none';
+        }
+    }
+
+    if (templateSelect) {
+        templateSelect.addEventListener('change', populateSubDropdowns);
+        // Initial population in case of form repopulation on error
+        if (templateSelect.value) {
+             populateSubDropdowns();
+        }
+    }
+});
+</script>
+{% endblock %} 

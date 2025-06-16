@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>{% block title %}Proje Yönetim Sistemi{% endblock %}</title>
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.png') }}" type="image/png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a class="nav-brand" href="{{ url_for('main_page') }}">Proje Yönetim Sistemi</a>
+            <ul class="nav-menu">
+                {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <span class="navbar-text">
+                            Hoş geldiniz, {{ current_user.username }} 
+                            ({% if current_user.is_admin %}
+                                Admin
+                            {% elif current_user.is_kurum_yoneticisi %}
+                                Kurum Yöneticisi
+                            {% elif current_user.is_teacher %}
+                                Öğretmen
+                            {% else %}
+                                Öğrenci
+                            {% endif %})
+                        </span>
+                    </li>
+                    {% if current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_panel') }}">Admin Paneli</a>
+                    </li>
+                    {% elif current_user.is_kurum_yoneticisi %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('kurum_yoneticisi_panel') }}">Kurum Yöneticisi Paneli</a>
+                    </li>
+                    {% endif %}
+                    {% if not current_user.is_admin %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('dashboard') }}">Kontrol Paneli</a>
+                    </li>
+                    {% endif %}
+                    {% if current_user.is_teacher %}
+                        <li class="nav-item"><a href="{{ url_for('create_team') }}">Takım Oluştur</a></li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('device_recog') }}">Malzeme Tanıma Aracı</a>
+                    </li>
+                    <li class="nav-item"><a href="{{ url_for('logout') }}">Çıkış Yap</a></li>
+                {% else %}
+                    <li class="nav-item"><a href="{{ url_for('login') }}">Giriş Yap</a></li>
+                    <li class="nav-item"><a href="{{ url_for('signup') }}">Kayıt Ol</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <div class="content-main">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Efe Deniz Akmansoy 
+            <br>
+            Tübitak Fen Lisesi 
+        </p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html> 

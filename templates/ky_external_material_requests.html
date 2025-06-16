@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Stok Dışı Malzeme Talepleri{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Stok Dışı Malzeme Talepleri</h1>
+<p>Öğrenciler tarafından talep edilen ve okul stoklarında bulunmayan malzemelerin listesi.</p>
+
+<div class="mb-4">
+    <a href="{{ url_for('ky_external_material_requests', status='Beklemede') }}" class="btn {% if current_filter == 'Beklemede' %}btn-primary{% else %}btn-outline-primary{% endif %}">Beklemede</a>
+    <a href="{{ url_for('ky_external_material_requests', status='Onaylandı') }}" class="btn {% if current_filter == 'Onaylandı' %}btn-success{% else %}btn-outline-success{% endif %}">Onaylandı</a>
+    <a href="{{ url_for('ky_external_material_requests', status='Reddedildi') }}" class="btn {% if current_filter == 'Reddedildi' %}btn-danger{% else %}btn-outline-danger{% endif %}">Reddedildi</a>
+    <a href="{{ url_for('ky_external_material_requests', status='all') }}" class="btn {% if current_filter == 'all' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">Tümü</a>
+</div>
+
+
+{% if requests %}
+    {% for req in requests %}
+    <div class="card mb-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Talep #{{ req.id }}</strong> - Proje: <a href="{{ url_for('project_detail', project_id=req.project.id) }}">{{ req.project.name }}</a>
+                <br>
+                <small class="text-muted">Talep Eden: {{ req.requester.username }} | Tarih: {{ req.request_date.strftime('%d.%m.%Y %H:%M') }}</small>
+            </div>
+            <span class="badge badge-pill 
+                {% if req.status == 'Beklemede' %}badge-warning
+                {% elif req.status == 'Onaylandı' %}badge-success
+                {% elif req.status == 'Reddedildi' %}badge-danger
+                {% endif %}
+            ">{{ req.status }}</span>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">İstenen Malzemeler</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Ürün Adı</th>
+                        <th scope="col">Adet</th>
+                        <th scope="col">Tahmini Fiyat</th>
+                        <th scope="col">Link</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in req.items %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ "%.2f ₺"|format(item.estimated_price) if item.estimated_price else 'Belirtilmemiş' }}</td>
+                        <td>
+                            {% if item.product_link %}
+                                <a href="{{ item.product_link }}" target="_blank" rel="noopener noreferrer">Ürünü Görüntüle <i class="fas fa-external-link-alt fa-xs"></i></a>
+                            {% else %}
+                                Link Yok
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {% if req.status == 'Beklemede' %}
+            <hr>
+            <form action="{{ url_for('ky_process_external_request', request_id=req.id) }}" method="POST">
+                <div class="form-group">
+                    <label for="ky_notes_{{ req.id }}">Notlar (Reddetme durumunda zorunludur)</label>
+                    <textarea class="form-control" id="ky_notes_{{ req.id }}" name="ky_notes" rows="2"></textarea>
+                </div>
+                <div class="text-right">
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Reddet</button>
+                    <button type="submit" name="action" value="approve" class="btn btn-success">Onayla</button>
+                </div>
+            </form>
+            {% elif req.ky_notes %}
+                <hr>
+                <p class="card-text"><strong>Kurum Yöneticisi Notu:</strong> {{ req.ky_notes }}</p>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="alert alert-info">
+        Bu filtreye uygun talep bulunmamaktadır.
+    </div>
+{% endif %}
+
+{% endblock %} 

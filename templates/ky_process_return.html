@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Malzeme İade İşlemi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Malzeme İade İşlemi</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            Talep Detayları
+        </div>
+        <div class="card-body">
+            <p><strong>Talep ID:</strong> {{ material_request.id }}</p>
+            <p><strong>Proje:</strong> <a href="{{ url_for('project_detail', project_id=material_request.project.id) }}">{{ material_request.project.name }}</a></p>
+            <p><strong>Talebi Yapan:</strong> {{ material_request.requester.username }}</p>
+            <p><strong>Talep Tarihi:</strong> {{ material_request.request_date.strftime('%d-%m-%Y') }}</p>
+        </div>
+    </div>
+
+    <form method="POST" id="returnForm">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">İade Alınacak Malzemeler</h4>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Malzeme</th>
+                                <th class="text-center">Talep Edilen Miktar</th>
+                                <th class="text-center" style="width: 150px;">Çalışıyor (Adet)</th>
+                                <th class="text-center" style="width: 150px;">Bozuk (Adet)</th>
+                                <th class="text-center">Geri Alınmayan</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in material_request.items.all() %}
+                            <tr>
+                                <td>{{ item.material.name }}</td>
+                                <td class="text-center">{{ item.quantity_requested }}</td>
+                                <td>
+                                    <input type="number" class="form-control return-input" name="returned_working_{{ item.id }}" value="0" min="0" max="{{ item.quantity_requested }}" data-item-id="{{ item.id }}" data-requested="{{ item.quantity_requested }}">
+                                </td>
+                                <td>
+                                    <input type="number" class="form-control return-input" name="returned_broken_{{ item.id }}" value="0" min="0" max="{{ item.quantity_requested }}" data-item-id="{{ item.id }}" data-requested="{{ item.quantity_requested }}">
+                                </td>
+                                <td class="text-center not-returned" id="not_returned_{{ item.id }}">
+                                    {{ item.quantity_requested }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="alert alert-danger" id="error-message" style="display: none;"></div>
+                <div class="text-right">
+                    <a href="{{ url_for('ky_delivered_materials') }}" class="btn btn-secondary">İptal</a>
+                    <button type="submit" class="btn btn-primary">İade İşlemini Tamamla</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('returnForm');
+    const inputs = document.querySelectorAll('.return-input');
+    const errorMessage = document.getElementById('error-message');
+
+    function updateNotReturned(itemId, requested) {
+        const workingInput = document.querySelector(`input[name="returned_working_${itemId}"]`);
+        const brokenInput = document.querySelector(`input[name="returned_broken_${itemId}"]`);
+        const notReturnedEl = document.getElementById(`not_returned_${itemId}`);
+
+        const working = parseInt(workingInput.value, 10) || 0;
+        const broken = parseInt(brokenInput.value, 10) || 0;
+        
+        const totalReturned = working + broken;
+        const notReturned = requested - totalReturned;
+
+        notReturnedEl.textContent = notReturned;
+        
+        if (totalReturned > requested) {
+            workingInput.classList.add('is-invalid');
+            brokenInput.classList.add('is-invalid');
+            return false;
+        } else {
+            workingInput.classList.remove('is-invalid');
+            brokenInput.classList.remove('is-invalid');
+            return true;
+        }
+    }
+
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const itemId = this.dataset.itemId;
+            const requested = parseInt(this.dataset.requested, 10);
+            updateNotReturned(itemId, requested);
+        });
+    });
+
+    form.addEventListener('submit', function(e) {
+        let hasError = false;
+        errorMessage.style.display = 'none';
+        errorMessage.textContent = '';
+        
+        const itemIds = [...new Set([...inputs].map(i => i.dataset.itemId))];
+
+        itemIds.forEach(itemId => {
+            const requested = parseInt(document.querySelector(`input[data-item-id="${itemId}"]`).dataset.requested, 10);
+            if (!updateNotReturned(itemId, requested)) {
+                hasError = true;
+            }
+        });
+
+        if (hasError) {
+            e.preventDefault();
+            errorMessage.textContent = 'Hata: İade edilen toplam miktar (Çalışıyor + Bozuk), talep edilen miktarı aşamaz.';
+            errorMessage.style.display = 'block';
+        }
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Yönetici Paneli - Projeler{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Okuldaki Projeler</h1>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Projeleri Filtrele</h6>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{{ url_for('ky_projects') }}">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="filter_by">Filtreleme Kriteri</label>
+                        <select name="filter_by" id="filter_by" class="form-control">
+                            <option value="application_id" {% if filters.get('filter_by') == 'application_id' %}selected{% endif %}>Başvuru ID</option>
+                            <option value="project_name" {% if filters.get('filter_by') == 'project_name' %}selected{% endif %}>Proje Adı</option>
+                            <option value="student_name" {% if filters.get('filter_by') == 'student_name' %}selected{% endif %}>Öğrenci Adı</option>
+                            <option value="advisor_name" {% if filters.get('filter_by') == 'advisor_name' %}selected{% endif %}>Danışman Öğretmen</option>
+                            <option value="student_class" {% if filters.get('filter_by') == 'student_class' %}selected{% endif %}>Sınıf</option>
+                            <option value="competition_name" {% if filters.get('filter_by') == 'competition_name' %}selected{% endif %}>Yarışma Adı</option>
+                            <option value="main_topic" {% if filters.get('filter_by') == 'main_topic' %}selected{% endif %}>Ana Alan</option>
+                            <option value="sub_theme" {% if filters.get('filter_by') == 'sub_theme' %}selected{% endif %}>Alt Tema</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="filter_query">Filtre Değeri</label>
+                        <input type="text" name="filter_query" id="filter_query" class="form-control" placeholder="Aranacak metni girin..." value="{{ filters.get('filter_query', '') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary mr-2">Filtrele</button>
+                        <a href="{{ url_for('ky_projects') }}" class="btn btn-secondary">Sıfırla</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Proje Listesi</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="dataTable" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Başvuru ID</th>
+                            <th>Proje Adı</th>
+                            <th>Yarışma</th>
+                            <th>Öğrenciler</th>
+                            <th>Sınıflar</th>
+                            <th>Danışman</th>
+                            <th>Ana Alan</th>
+                            <th>Alt Tema</th>
+                            <th>Durum</th>
+                            <th>Detay</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p_data in projects_data %}
+                        <tr>
+                            <td>{{ p_data.application_id }}</td>
+                            <td>{{ p_data.name }}</td>
+                            <td>{{ p_data.competition_name }}</td>
+                            <td>{{ p_data.students }}</td>
+                            <td>{{ p_data.classes }}</td>
+                            <td>{{ p_data.advisor }}</td>
+                            <td>{{ p_data.main_topic }}</td>
+                            <td>{{ p_data.sub_theme }}</td>
+                            <td><span class="badge badge-pill {% if 'Tamamlandı' in p_data.status %}badge-success{% else %}badge-info{% endif %}">{{ p_data.status }}</span></td>
+                            <td>
+                                <a href="{{ url_for('project_detail', project_id=p_data.id) }}" class="btn btn-sm btn-info">Görüntüle</a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="10" class="text-center">Henüz bu kuruma ait proje bulunmamaktadır.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

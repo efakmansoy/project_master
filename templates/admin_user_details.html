@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Kullanıcı Detayları: {{ viewed_user.username }} - Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="user-detail-header mb-4">
+        <h1>Kullanıcı Detayları: {{ viewed_user.username }}</h1>
+        <p><strong>E-posta:</strong> {{ viewed_user.email }}</p>
+        <p>
+            <strong>Rol:</strong> 
+            {% if viewed_user.is_admin %}Admin
+            {% elif viewed_user.is_kurum_yoneticisi %}Kurum Yöneticisi
+            {% elif viewed_user.is_teacher %}Öğretmen
+            {% else %}Öğrenci
+            {% endif %}
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Üyesi Olduğu Takımlar</h4>
+            {% if member_of_teams %}
+                <ul class="list-group">
+                    {% for team in member_of_teams %}
+                        <li class="list-group-item">{{ team.name }} (Danışman: {{ team.advisor.username }})</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Bu kullanıcı hiçbir takımın üyesi değil.</p>
+            {% endif %}
+        </div>
+
+        {% if viewed_user.is_teacher or viewed_user.is_kurum_yoneticisi %}
+        <div class="col-md-6">
+            <h4>Danışmanı Olduğu Takımlar</h4>
+            {% if advised_teams_with_students %}
+                {% for team_info in advised_teams_with_students %}
+                    <div class="card mb-3">
+                        <div class="card-header">{{ team_info.team.name }}</div>
+                        <ul class="list-group list-group-flush">
+                            {% if team_info.students %}
+                                {% for student in team_info.students %}
+                                    <li class="list-group-item">{{ student.username }} (Öğrenci)</li>
+                                {% endfor %}
+                            {% else %}
+                                <li class="list-group-item">Bu takımda öğrenci bulunmamaktadır.</li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Bu kullanıcı hiçbir takımın danışmanı değil veya danışmanı olduğu takımlarda öğrenci yok.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <hr class="mt-4 mb-4">
+
+    <h4>İlişkili Projeler</h4>
+    {% if user_projects %}
+        <div class="list-group">
+            {% for project in user_projects %}
+                <a href="{{ url_for('project_detail', project_id=project.id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ project.name }}</h5>
+                        <small>Takım: {{ project.team.name }}</small>
+                    </div>
+                    <p class="mb-1">{{ project.description|truncate(150) }}</p>
+                    <small>İlerleme: {{ project.progress }}%</small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Bu kullanıcıyla ilişkili proje bulunmamaktadır veya kullanıcının takımlarında proje yoktur.</p>
+    {% endif %}
+
+    <p class="mt-5">
+        <a href="{{ url_for('manage_users') }}" class="btn btn-secondary">&larr; Kullanıcı Yönetimine Dön</a>
+    </p>
+</div>
+{% endblock %} 

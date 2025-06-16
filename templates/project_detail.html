@@ -1,0 +1,409 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.name }} - Proje Detayları{% endblock %}
+
+{% block content %}
+<div class="container mt-4 project-detail-container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-0">{{ project.name }}</h2>
+                    <p class="lead mb-0">
+                        Takım: <a href="#">{{ project.team.name }}</a> (Danışman: {{ project.team.advisor.username }})
+                    </p>
+                    <p class="text-muted">{{ project.description }}</p>
+                </div>
+                <div>
+                    {% if can_edit_project %}
+                        {% if current_user.is_student %}
+                            <a href="{{ url_for('list_materials', project_id=project.id) }}" class="btn btn-info">Malzeme Talep Et</a>
+                        {% endif %}
+                        <form action="{{ url_for('toggle_project_completion', project_id=project.id) }}" method="POST" class="d-inline-block ml-2">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="completionSwitch" name="is_completed" 
+                                       {% if project.is_completed %}checked{% endif %} onchange="this.form.submit()" style="transform: scale(1.5);">
+                                <label class="form-check-label" for="completionSwitch" style="font-size: 1.2rem; padding-left: 10px;">
+                                    {% if project.is_completed %}
+                                        Tamamlandı
+                                    {% else %}
+                                        Devam Ediyor
+                                    {% endif %}
+                                </label>
+                            </div>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if project.competition_template %}
+                <div class="card bg-light mb-3">
+                    <div class="card-header">Yarışma Şablonu Bilgileri: {{ project.competition_template.name }}</div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>MEB İzni:</strong> {{ 'Gerekli' if project.competition_template.requires_meg_approval else 'Gerekli Değil' }}
+                        </p>
+                        
+                        {% if project.competition_template.defined_documents and project.competition_template.defined_documents.all()|length > 0 %}
+                            <h5 class="mt-3">Şablon Dökümanları:</h5>
+                            <ul>
+                            {% for doc in project.competition_template.defined_documents.all() %}
+                                <li>
+                                    <a href="{{ url_for('serve_competition_template_document', template_id=project.competition_template.id, filename=doc.filename) }}" target="_blank">
+                                        <i class="fas fa-file-download"></i> {{ doc.display_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p class="text-muted mt-3">Bu şablon için tanımlanmış ek döküman yok.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if project.competition_template and project.competition_template.requires_meg_approval %}
+                <div class="card bg-light mb-3">
+                    <div class="card-header">MEB İzin Durumu</div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <strong>Mevcut Durum:</strong> 
+                            <span class="badge 
+                                {% if project.meg_approval_status == 'İzin Alındı' %}badge-success
+                                {% elif project.meg_approval_status == 'İzin Beklemede' %}badge-warning
+                                {% else %}badge-danger
+                                {% endif %}">
+                                {{ project.meg_approval_status }}
+                            </span>
+                        </p>
+                        {% if can_edit_project %}
+                        <form method="POST" action="{{ url_for('update_meg_status', project_id=project.id) }}" class="form-inline mt-3">
+                            <div class="form-group mr-2">
+                                <label for="meg_status" class="mr-2">Durumu Güncelle:</label>
+                                <select name="meg_status" id="meg_status" class="form-control form-control-sm">
+                                    <option value="İzin İstenmedi" {% if project.meg_approval_status == 'İzin İstenmedi' %}selected{% endif %}>İzin İstenmedi</option>
+                                    <option value="İzin Beklemede" {% if project.meg_approval_status == 'İzin Beklemede' %}selected{% endif %}>İzin Beklemede</option>
+                                    <option value="İzin Alındı" {% if project.meg_approval_status == 'İzin Alındı' %}selected{% endif %}>İzin Alındı</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Application ID Section -->
+            <div class="card mb-3">
+                <div class="card-header">Başvuru ID</div>
+                <div class="card-body">
+                    <p><strong>Mevcut ID:</strong> {{ project.application_id or 'Henüz Girilmedi' }}</p>
+                    {% if can_edit_project %}
+                    <form action="{{ url_for('update_application_id', project_id=project.id) }}" method="POST" class="form-inline">
+                        <div class="form-group mr-2">
+                            <label for="application_id" class="sr-only">Başvuru ID</label>
+                            <input type="text" class="form-control form-control-sm" name="application_id" id="application_id" value="{{ project.application_id or '' }}" placeholder="Yeni ID Gir/Güncelle">
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary">Kaydet</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+
+            <h4 class="mb-3">Proje İlerlemesi: {{ project.progress }}%</h4>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar" role="progressbar" style="width: {{ project.progress }}%;" aria-valuenow="{{ project.progress }}" aria-valuemin="0" aria-valuemax="100">{{ project.progress }}%</div>
+            </div>
+            {% if can_edit_project %}
+            <form action="{{ url_for('update_progress', project_id=project.id) }}" method="POST" class="form-inline mt-3">
+                <div class="form-group mr-2">
+                    <label for="progress" class="sr-only">İlerlemeyi Güncelle (%):</label>
+                    <input type="number" class="form-control" id="progress" name="progress" min="0" max="100" value="{{ project.progress }}" required>
+                </div>
+                <button type="submit" class="btn btn-info">Güncelle</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="col-md-4">
+            <h4>Proje Dosyaları</h4>
+            {% if project_files %}
+                <ul class="list-group mb-3">
+                    {% for file in project_files %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('uploaded_file_or_image', folder='files', project_id_str=project.id|string, filename=file.name) }}" target="_blank">{{ file.name }}</a>
+                            <span class="badge badge-primary badge-pill">{{ file.uploaded_at.strftime('%d-%m-%Y') }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Henüz yüklenmiş dosya yok.</p>
+            {% endif %}
+            {% if can_edit_project %}
+            <form method="POST" action="{{ url_for('upload_project_file', project_id=project.id) }}" enctype="multipart/form-data" class="mb-3">
+                <div class="form-group">
+                    <label for="file_upload">Dosya Yükle (Belge, Sunum vb.):</label>
+                    <input type="file" id="file_upload" name="project_file" class="form-control-file form-control" required>
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">Yükle</button>
+            </form>
+            {% endif %}
+
+            <hr>
+
+            <h4>Proje Görselleri</h4>
+             {% if project_images %}
+                <div class="row">
+                    {% for image in project_images %}
+                        <div class="col-md-6 mb-2">
+                            <a href="{{ url_for('uploaded_file_or_image', folder='images', project_id_str=project.id|string, filename=image.name) }}" data-lightbox="project-images">
+                                <img src="{{ url_for('uploaded_file_or_image', folder='images', project_id_str=project.id|string, filename=image.name) }}" alt="{{ image.name }}" class="img-thumbnail" style="width:100%; height:150px; object-fit: cover;">
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Henüz yüklenmiş görsel yok.</p>
+            {% endif %}
+            {% if can_edit_project %}
+            <form method="POST" action="{{ url_for('upload_project_image', project_id=project.id) }}" enctype="multipart/form-data" class="mb-3">
+                <div class="form-group">
+                    <label for="image_upload">Görsel Yükle (Resim):</label>
+                    <input type="file" id="image_upload" name="project_image" class="form-control-file form-control" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">Yükle</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Project Status Notes Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Proje Adım Takibi</h4>
+        </div>
+        <div class="card-body">
+            {% if can_edit_project %}
+            <form action="{{ url_for('update_status_notes', project_id=project.id) }}" method="POST">
+                <div class="form-group">
+                    <label for="status_notes">Durum Notları:</label>
+                    <textarea class="form-control" id="status_notes" name="status_notes" rows="4">{{ project.status_notes or '' }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Durumu Güncelle</button>
+            </form>
+            {% else %}
+            <div>
+                <h5>Mevcut Durum Notları:</h5>
+                <p class="card-text">
+                    {{ project.status_notes or 'Henüz bir durum notu eklenmemiş.' }}
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Material Requests Section -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4 class="mb-0">Malzeme Talepleri</h4>
+        </div>
+        <div class="card-body">
+            {% if material_requests %}
+                <div class="list-group">
+                    {% for req in material_requests %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Talep #{{ req.id }} - <span class="badge 
+                                    {% if req.status == 'Onaylandı' %}badge-success
+                                    {% elif req.status == 'Reddedildi' %}badge-danger
+                                    {% elif req.status == 'Danışman Onayı Bekliyor' %}badge-warning
+                                    {% else %}badge-secondary
+                                    {% endif %}">
+                                    {{ req.status }}
+                                </span></h5>
+                                <small>{{ req.request_date.strftime('%d-%m-%Y %H:%M') }}</small>
+                            </div>
+                            <p class="mb-1">Talebi yapan: {{ req.requester.username }}</p>
+                            <ul class="list-unstyled mt-2">
+                                {% for item in req.items.all() %}
+                                    <li>{{ item.quantity_requested }} x {{ item.material.name }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% if req.advisor_notes %}
+                                <div class="alert alert-info mt-2">
+                                    <strong>Danışman Notu:</strong> {{ req.advisor_notes }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted">Bu proje için yapılmış malzeme talebi bulunmuyor.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="mb-3">Proje Zaman Çizelgesi</h4>
+            {% if timeline_events %}
+                <ul class="list-group timeline">
+                    {% for event in timeline_events %}
+                        <li class="list-group-item {% if event.is_overdue %}list-group-item-danger{% endif %} {% if event.is_from_template %}timeline-template{% endif %}">
+                            <strong>{{ event.date.strftime('%d-%m-%Y') }}:</strong> {{ event.description }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Zaman çizelgesi etkinliği bulunmuyor.</p>
+            {% endif %}
+            {% if current_user.is_kurum_yoneticisi %}
+            <form method="POST" action="{{ url_for('add_timeline_event', project_id=project.id) }}" class="card mt-3 p-3">
+                <h5>Yeni Zaman Çizelgesi Etkinliği Ekle</h5>
+                <div class="form-group">
+                    <label for="event_date">Tarih:</label>
+                    <input type="date" id="event_date" name="event_date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="event_description">Açıklama:</label>
+                    <textarea id="event_description" name="event_description" class="form-control" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-sm btn-secondary">Ekle</button>
+            </form>
+            {% endif %}
+        </div>
+        <div class="col-md-6">
+            <h4 class="mb-3">Görevler</h4>
+            {% if tasks %}
+                <ul class="list-group tasks">
+                    {% for task in tasks %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center {% if task.is_overdue %}task-overdue{% endif %}">
+                            <div>
+                                <span class="{{ 'task-complete' if task.is_complete else '' }}">{{ task.description }}</span>
+                                {% if task.due_date %}
+                                    <small class="d-block text-muted">Bitiş: {{ task.due_date.strftime('%d-%m-%Y') }}</small>
+                                {% endif %}
+                            </div>
+                            {% if can_edit_project %}
+                            <form action="{{ url_for('toggle_task_completion', project_id=project.id, task_id=task.id) }}" method="POST">
+                                <button type="submit" class="btn btn-sm {{ 'btn-success' if task.is_complete else 'btn-outline-secondary' }}">
+                                    <i class="fas {{ 'fa-check-square' if task.is_complete else 'fa-square' }}"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-muted">Proje için görev bulunmuyor.</p>
+            {% endif %}
+
+            {% if can_edit_project %}
+            <form method="POST" action="{{ url_for('add_task', project_id=project.id) }}" class="card mt-3 p-3">
+                <h5>Yeni Görev Ekle</h5>
+                <div class="form-group">
+                    <label for="task_description">Açıklama:</label>
+                    <textarea id="task_description" name="task_description" class="form-control" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task_due_date">Bitiş Tarihi (Opsiyonel):</label>
+                    <input type="date" id="task_due_date" name="task_due_date" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-sm btn-secondary">Ekle</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Anasayfaya Dön</a>
+        </div>
+    </div>
+</div>
+
+{% if can_edit_project and project.is_completed and project.survey_token %}
+<div class="modal fade" id="surveyModal" tabindex="-1" aria-labelledby="surveyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="surveyModalLabel">Proje Tamamlanma Anketi: {{ project.name }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Projeyi tamamladığınız için tebrikler! Lütfen aşağıdaki kısa anketi doldurarak proje hakkındaki görüşlerinizi bizimle paylaşın.</p>
+        
+        <form action="{{ url_for('survey_page', token=project.survey_token) }}" method="POST" target="_blank">
+            <div class="form-group">
+                <label for="modal_respondent_name">Adınız Soyadınız <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="modal_respondent_name" name="respondent_name" value="{{ current_user.username }}" required>
+            </div>
+            <div class="form-group">
+                <label for="modal_work_results">Bu projenin temel sonuçları ve çıktıları nelerdi? (Örn: Rapor, sunum, prototip vb.) <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="modal_work_results" name="work_results" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="modal_contribution">Projenin size ve takımınıza kişisel veya akademik olarak ne gibi katkıları oldu? <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="modal_contribution" name="contribution" rows="3" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="modal_suggestions">Proje süreci veya sonucuyla ilgili herhangi bir öneriniz veya eklemek istediğiniz bir yorum var mı?</label>
+                <textarea class="form-control" id="modal_suggestions" name="suggestions" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Anketi Gönder</button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.timeline-event.past-due {
+    border-left: 5px solid #dc3545; /* Bootstrap danger color */
+}
+.timeline-event.template-event {
+    background-color: #e9ecef; /* A light gray background */
+    border-left: 5px solid #17a2b8; /* Bootstrap info color */
+}
+.task-item.task-complete span {
+    text-decoration: line-through;
+    color: #6c757d; /* Bootstrap muted color */
+}
+.task-item.task-overdue {
+    border-left: 5px solid #ffc107; /* Bootstrap warning color */
+}
+.task-description-and-toggle {
+    display: flex;
+    align-items: center;
+}
+.project-detail-container h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('show_survey_popup') === 'true') {
+        const surveyModalElement = document.getElementById('surveyModal');
+        if (surveyModalElement) {
+            const surveyModal = new bootstrap.Modal(surveyModalElement);
+            surveyModal.show();
+        }
+    }
+});
+</script>
+{% endblock %} 

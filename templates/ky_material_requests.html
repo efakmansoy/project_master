@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Malzeme İstek Listeleri{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Danışman Onayı Almış Malzeme Talepleri</h2>
+    
+    {% include '_flash_messages.html' %}
+
+    <div class="card">
+        <div class="card-body">
+            {% if requests %}
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Talep ID</th>
+                            <th>Proje Adı</th>
+                            <th>Talebi Yapan</th>
+                            <th>Talep Tarihi</th>
+                            <th>Malzemeler</th>
+                            <th class="text-center">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr>
+                            <td>{{ req.id }}</td>
+                            <td><a href="{{ url_for('project_detail', project_id=req.project.id) }}">{{ req.project.name }}</a></td>
+                            <td>{{ req.requester.username }}</td>
+                            <td>{{ req.request_date.strftime('%d-%m-%Y') }}</td>
+                            <td>
+                                <ul class="list-unstyled mb-0 pl-3">
+                                {% for item in req.items %}
+                                    <li>- {{ item.quantity_requested }} x {{ item.material.name }}</li>
+                                {% endfor %}
+                                </ul>
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ url_for('deliver_material_request', request_id=req.id) }}" class="btn btn-success btn-sm" target="_blank" title="Teslim tutanağı oluştur ve indir">
+                                    <i class="fas fa-file-pdf"></i> Tutanak Oluştur
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Henüz danışman tarafından onaylanmış malzeme talebi bulunmuyor.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

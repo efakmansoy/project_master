@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ team.name }} Takımına Üye Ekle - Proje Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Takıma Üye Ekle: {{ team.name }}</h2>
+    <p>Mevcut Üyeler:</p>
+    <ul>
+        <li>{{ team.advisor.username }} (Danışman)</li>
+        {% for member in team.members %}
+            {% if member.id != team.advisor_id %}
+                <li>{{ member.username }} ({{member.email}})</li>
+            {% endif %}
+        {% else %}
+            {% if team.members|length <= 1 %} {# Only advisor is a member initially by this logic #}
+                 <li>Henüz başka üye yok.</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <form method="POST" action="{{ url_for('add_member_to_team_route', team_id=team.id) }}">
+        <div class="form-group">
+            <label for="email">Eklenecek Kullanıcının E-posta Adresi</label>
+            <input type="email" id="email" name="email" class="form-control" value="{{ email if email else '' }}" required>
+            <small>Kullanıcının sistemde zaten bir hesabı olmalıdır. Öğretmenler takım üyesi olarak eklenemez.</small>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Üye Ekle</button>
+    </form>
+    <p class="mt-3 text-center">
+        <a href="{{ url_for('dashboard') }}">Kontrol Paneline Geri Dön</a>
+    </p>
+</div>
+{% endblock %} 

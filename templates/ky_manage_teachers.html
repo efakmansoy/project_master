@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Eklediğim Danışman Öğretmenler - Kurum Yöneticisi Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Eklediğim Danışman Öğretmenler</h1>
+    <p>Bu sayfadan kendi eklediğiniz danışman öğretmenleri görüntüleyebilirsiniz.</p>
+
+    {% if teachers %}
+    <table class="table table-striped table-hover table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Kullanıcı Adı</th>
+                <th>E-posta</th>
+                <th>E-posta Doğrulanmış</th>
+                <th>İşlemler</th> {# Placeholder for future actions like view details, edit, delete #}
+            </tr>
+        </thead>
+        <tbody>
+            {% for teacher in teachers %}
+            <tr>
+                <td>
+                    {# Link to a new teacher detail view specific for KY will be added here later #}
+                    <a href="{{ url_for('ky_view_teacher_details', teacher_id=teacher.id) }}">{{ teacher.username }}</a>
+                </td>
+                <td>{{ teacher.email }}</td>
+                <td>{{ 'Evet' if teacher.email_verified else 'Hayır' }}</td>
+                <td>
+                    <a href="{{ url_for('ky_view_teacher_details', teacher_id=teacher.id) }}" class="btn btn-sm btn-info">Detayları Gör</a>
+                    {# Add other actions like Edit or Delete for KY if needed in future #}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="mt-3">Henüz hiç danışman öğretmen eklemediniz.</p>
+    {% endif %}
+
+    <p class="mt-4">
+        <a href="{{ url_for('kurum_yoneticisi_panel') }}" class="btn btn-secondary">&larr; Kurum Yöneticisi Paneline Dön</a>
+    </p>
+</div>
+
+{% endblock %} 

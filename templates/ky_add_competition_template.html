@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}Yeni Yarışma Şablonu Ekle - Kurum Yöneticisi Paneli{% endblock %}
+
+{% block head_extra %}
+<style>
+    .dynamic-input-block {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+    .input-group-dynamic {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+    }
+    .remove-btn {
+        /* margin-left: 10px; */ /* Adjusted by flex gap */
+    }
+    .list-dynamic-items .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: .5rem .75rem; /* Reduced padding */
+    }
+    .list-dynamic-items .list-group-item .remove-item-btn {
+        margin-left: 10px;
+        font-size: 1.1rem; /* Slightly larger X */
+        line-height: 1; /* Ensure it aligns well */
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container" style="max-width: 800px;">
+    <h2>Yeni Yarışma Şablonu Oluştur</h2>
+    <p>Bu form ile yeni bir yarışma/proje tipi şablonu oluşturabilirsiniz. Birden fazla ana konu, ortak alt temalar, önemli tarihler ve döküman şablonları ekleyebilirsiniz.</p>
+    
+    <form method="POST" action="{{ url_for('ky_add_competition_template') }}" enctype="multipart/form-data" id="addCompetitionTemplateForm">
+        <div class="form-group">
+            <label for="name">Şablon Adı <span class="text-danger">*</span></label>
+            <input type="text" id="name" name="name" class="form-control" value="{{ form_data.name if form_data else '' }}" required>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" class="form-check-input" id="requires_meg_approval" name="requires_meg_approval" {% if form_data and form_data.requires_meg_approval %}checked{% endif %}>
+            <label class="form-check-label" for="requires_meg_approval">MEB Onayı Gerektirir</label>
+        </div>
+
+        <hr>
+        <h4>Ana Konular</h4>
+        <div class="form-group">
+            <label>Ana Konular</label>
+            <div class="input-group mb-2">
+                <input type="text" id="new_topic_input" class="form-control" placeholder="Yeni ana konu ekle...">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-secondary" id="add_new_topic_button">Ekle</button>
+                </div>
+            </div>
+            <ul id="main_topics_list" class="list-group list-group-flush list-dynamic-items">
+                <!-- Topics will be added here by JS -->
+            </ul>
+        </div>
+
+        <hr>
+        <h4>Alt Temalar</h4>
+        <div class="form-group">
+            <label>Ortak Alt Temalar</label>
+            <div class="input-group mb-2">
+                <input type="text" id="new_theme_input" class="form-control" placeholder="Yeni alt tema ekle...">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-secondary" id="add_new_theme_button">Ekle</button>
+                </div>
+            </div>
+            <ul id="common_themes_list" class="list-group list-group-flush list-dynamic-items">
+                <!-- Themes will be added here by JS -->
+            </ul>
+        </div>
+        <input type="hidden" name="topics_themes_json" id="topics_themes_json_input">
+        
+        <hr>
+        <h4>Önemli Tarihler</h4>
+        <div id="defined-dates-container">
+            <!-- Existing dates will be loaded here on edit, new dates added by JS -->
+        </div>
+        <button type="button" id="add-defined-date" class="btn btn-sm btn-outline-secondary mb-3">Yeni Tarih Ekle</button>
+
+        <hr>
+        <h4>Şablon Dökümanları</h4>
+        <div id="defined-documents-container">
+            <!-- Existing documents will be loaded here on edit, new documents added by JS -->
+        </div>
+        <button type="button" id="add-defined-document" class="btn btn-sm btn-outline-secondary mb-3">Yeni Döküman Ekle</button>
+
+        <hr>
+        <button type="submit" class="btn btn-primary btn-block">Şablonu Oluştur</button>
+    </form>
+    <p class="mt-3 text-center">
+        <a href="{{ url_for('kurum_yoneticisi_panel') }}">Kurum Yöneticisi Paneline Geri Dön</a>
+    </p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addForm = document.getElementById('addCompetitionTemplateForm');
+    const topicsThemesJsonInput = document.getElementById('topics_themes_json_input');
+
+    // Function to add item to a list (for topics or themes)
+    function addItemToList(inputValue, listElement, itemType) {
+        if (!inputValue.trim()) return; // Do not add empty items
+
+        const listItem = document.createElement('li');
+        listItem.classList.add('list-group-item');
+        listItem.textContent = inputValue.trim();
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.classList.add('btn', 'btn-sm', 'btn-danger', 'remove-item-btn');
+        removeBtn.innerHTML = '&times;'; // 'X' character
+        removeBtn.title = itemType === 'topic' ? 'Bu konuyu sil' : 'Bu temayı sil';
+        removeBtn.onclick = function() {
+            listItem.remove();
+        };
+        
+        listItem.appendChild(removeBtn);
+        listElement.appendChild(listItem);
+    }
+
+    // Main Topics
+    const newTopicInput = document.getElementById('new_topic_input');
+    const addNewTopicButton = document.getElementById('add_new_topic_button');
+    const mainTopicsList = document.getElementById('main_topics_list');
+    
+    addNewTopicButton.addEventListener('click', function() {
+        addItemToList(newTopicInput.value, mainTopicsList, 'topic');
+        newTopicInput.value = ''; // Clear input
+    });
+    newTopicInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addItemToList(newTopicInput.value, mainTopicsList, 'topic');
+            newTopicInput.value = '';
+        }
+    });
+
+    // Common Themes
+    const newThemeInput = document.getElementById('new_theme_input');
+    const addNewThemeButton = document.getElementById('add_new_theme_button');
+    const commonThemesList = document.getElementById('common_themes_list');
+
+    addNewThemeButton.addEventListener('click', function() {
+        addItemToList(newThemeInput.value, commonThemesList, 'theme');
+        newThemeInput.value = ''; // Clear input
+    });
+    newThemeInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addItemToList(newThemeInput.value, commonThemesList, 'theme');
+            newThemeInput.value = '';
+        }
+    });
+    
+    // --- Manage Defined Dates (from ky_add_competition_template) ---
+    let dateCounter = 0; // Start with 0 for new templates
+    const datesContainer = document.getElementById('defined-dates-container');
+    document.getElementById('add-defined-date').addEventListener('click', function() {
+        const newDateRow = document.createElement('div');
+        newDateRow.classList.add('defined-item-row', 'mb-2', 'p-2', 'border', 'rounded', 'new-item');
+        // Use `new_date_name/value_X` for new items on the add page directly
+        newDateRow.innerHTML = `
+            <div class="form-row align-items-center">
+                <div class="col">
+                    <input type="text" name="defined_date_name_${dateCounter}" class="form-control form-control-sm" placeholder="Etkinlik Adı (örn: Proje Teslim)" required>
+                </div>
+                <div class="col">
+                    <input type="date" name="defined_date_value_${dateCounter}" class="form-control form-control-sm" required>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-danger remove-defined-item" title="Bu tarihi sil">&times;</button>
+                </div>
+            </div>
+        `;
+        datesContainer.appendChild(newDateRow);
+        dateCounter++;
+    });
+
+    // --- Manage Defined Documents (from ky_add_competition_template) ---
+    let docCounter = 0; // Start with 0 for new templates
+    const documentsContainer = document.getElementById('defined-documents-container');
+    document.getElementById('add-defined-document').addEventListener('click', function() {
+        const newDocRow = document.createElement('div');
+        newDocRow.classList.add('defined-item-row', 'mb-2', 'p-2', 'border', 'rounded', 'new-item');
+        newDocRow.innerHTML = `
+            <div class="form-group">
+                <label class="sr-only">Görünen Ad:</label>
+                <input type="text" name="doc_display_name_${docCounter}" class="form-control form-control-sm mb-1" placeholder="Döküman Adı (örn: Yarışma Şartnamesi)" required>
+            </div>
+            <div class="form-group">
+                <label class="sr-only">Dosya Yükle:</label>
+                <input type="file" name="doc_file_${docCounter}" class="form-control-file form-control-sm mb-1" required>
+            </div>
+            <button type="button" class="btn btn-sm btn-danger remove-defined-item mt-1" title="Bu dökümanı sil">&times;</button>
+        `;
+        documentsContainer.appendChild(newDocRow);
+        docCounter++;
+    });
+
+    // Generic remove button for dates and documents
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('remove-defined-item')) {
+            const itemRow = event.target.closest('.defined-item-row');
+            if (itemRow) {
+                itemRow.remove();
+            }
+        }
+    });
+
+    // Before form submission, gather topics and themes into JSON
+    if (addForm) {
+        addForm.addEventListener('submit', function(event) {
+            const topics = Array.from(mainTopicsList.querySelectorAll('li')).map(li => li.textContent.slice(0, -1)); // Remove '×'
+            const themes = Array.from(commonThemesList.querySelectorAll('li')).map(li => li.textContent.slice(0, -1)); // Remove '×'
+            
+            const topicsThemesData = {
+                topics: topics,
+                common_themes: themes
+            };
+            topicsThemesJsonInput.value = JSON.stringify(topicsThemesData);
+        });
+    }
+});
+</script>
+{% endblock %} 

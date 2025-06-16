@@ -1,0 +1,14 @@
+<div class="form-group">
+    <label for="project_name">Proje Adı</label>
+    <input type="text" class="form-control" id="project_name" name="project_name" value="{{ project.project_name or '' }}" required>
+</div>
+
+<div class="form-group">
+    <label for="application_id">Başvuru ID (Kurum Tarafından Verilen)</label>
+    <input type="text" class="form-control" id="application_id" name="application_id" value="{{ project.application_id or '' }}">
+</div>
+
+<div class="form-group">
+    <label for="project_description">Proje Açıklaması</label>
+    <textarea class="form-control" id="project_description" name="project_description" rows="3" required>{{ project.project_description or '' }}</textarea>
+</div> 

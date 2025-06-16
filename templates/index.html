@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Kontrol Paneli - Proje Yönetim Sistemi{% endblock %}
+
+{% block content %}
+    <h1>Kontrol Paneli</h1>
+
+    {# Kullanıcının Takımlarını Listele #}
+    {% if user_teams %}
+        <h2>Takımlarım</h2>
+        <div class="teams-list">
+            {% for team in user_teams %}
+                <div class="team-item">
+                    <h3>{{ team.name }}</h3>
+                    <p>Danışman: {{ team.advisor.username }}</p>
+                    {% if current_user.is_teacher and team.advisor_id == current_user.id %}
+                        <a href="{{ url_for('add_member_to_team_route', team_id=team.id) }}" class="btn btn-primary btn-sm">Üye Ekle</a> {# Üye ekleme sayfasına link #}
+                        <a href="{{ url_for('add_project_to_team_route', team_id=team.id) }}" class="btn btn-primary btn-sm">Bu Takıma Proje Ekle</a> {# Bu takıma proje ekleme sayfasına link #}
+                    {% endif %}
+                    <p>Üyeler: {{ team.members|length }}</p>
+                    <ul>
+                        {% for member in team.members %}
+                            <li>{{ member.username }} ({% if member.id == team.advisor_id %}Danışman{% else %}Öğrenci{% endif %})</li>
+                        {% else %}
+                            <li>Henüz üye yok (danışman dışında).</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        {% if current_user.is_teacher %}
+            <p>Henüz hiç takım oluşturmadınız. <a href="{{ url_for('create_team') }}">Şimdi bir tane oluşturun!</a></p>
+        {% else %}
+            <p>Henüz hiçbir takımın üyesi değilsiniz.</p>
+        {% endif %}
+    {% endif %}
+
+    <hr>
+
+    {# Proje Ekleme Formu - Şimdilik kaldırıldı, takımlarla entegre edilecek #}
+    {#
+    <h2>Yeni Proje Ekle (Eski Form - Güncellenecek)</h2>
+    <form method="post" action="{{ url_for('add_project') }}">
+        <div>
+            <label for="project_name">Proje Adı:</label>
+            <input type="text" id="project_name" name="project_name" required>
+        </div>
+        <div>
+            <label for="project_description">Açıklama:</label>
+            <textarea id="project_description" name="project_description" required></textarea>
+        </div>
+        <button type="submit">Proje Ekle</button>
+    </form>
+    #}
+
+    <h2>Projeler</h2>
+    {% if projects %}
+        <div class="projects-list">
+            {% for project in projects %}
+                <div class="project-item">
+                    <h4><a href="{{ url_for('project_detail', project_id=project.id) }}">{{ project.name }}</a></h4>
+                    <p>Takım: {{ project.team.name }}</p>
+                    <p>İlerleme: {{ project.progress }}%</p>
+                </div>
+            {% else %}
+                 <p>Takımlarınız için proje bulunamadı.</p>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Takımlarınız için proje bulunamadı. {% if current_user.is_teacher %}Takımlarınızdan birine proje eklemeyi düşünün.{% endif %}</p>
+    {% endif %}
+{% endblock %} 

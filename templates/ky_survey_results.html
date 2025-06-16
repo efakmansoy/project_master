@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Anket Sonuçları: {{ project.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-2">Anket Sonuçları</h2>
+    <h3 class="text-muted mb-4">Proje: {{ project.name }}</h3>
+
+    <a href="{{ url_for('ky_projects') }}" class="btn btn-secondary mb-4">&larr; Proje Listesine Geri Dön</a>
+
+    {% if responses %}
+        {% for response in responses %}
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Cevaplayan: {{ response.respondent_name }}</strong>
+                <small class="text-muted">Tarih: {{ response.submitted_at.strftime('%d-%m-%Y %H:%M') }}</small>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Bu projenin temel sonuçları ve çıktıları nelerdi?</dt>
+                    <dd class="col-sm-8">{{ response.work_results_feedback }}</dd>
+
+                    <dt class="col-sm-4">Projenin size ve takımınıza kişisel veya akademik olarak ne gibi katkıları oldu?</dt>
+                    <dd class="col-sm-8">{{ response.contribution_feedback }}</dd>
+
+                    <dt class="col-sm-4">Proje süreci veya sonucuyla ilgili herhangi bir öneriniz veya eklemek istediğiniz bir yorum var mı?</dt>
+                    <dd class="col-sm-8">{{ response.suggestions_feedback or 'Yorum yapılmamış.' }}</dd>
+                </dl>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            Bu proje için henüz bir anket cevabı gönderilmemiş.
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Öğretmen Bilgileri{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">Kayıt Tamamla (Öğretmen)</h3>
+                </div>
+                <div class="card-body">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    <form method="POST" action="{{ url_for('signup_teacher_info') }}">
+                        <div class="form-group mb-3">
+                            <label for="tc_kimlik_no">T.C. Kimlik Numarası</label>
+                            <input type="text" class="form-control" id="tc_kimlik_no" name="tc_kimlik_no" required pattern="\d{11}" title="T.C. Kimlik Numarası 11 haneli olmalıdır.">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Kaydı Tamamla</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

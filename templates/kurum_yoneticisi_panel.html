@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Kurum Yöneticisi Paneli - Proje Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Kurum Yöneticisi Paneli</h1>
+    <p class="mb-4">Hoş geldiniz, {{ current_user.username }}. Bu panelden danışman öğretmenleri yönetebilir ve raporları görüntüleyebilirsiniz.</p>
+
+    <div class="admin-actions"> {# Using similar styling to admin-actions for consistency #}
+        <div class="mb-3">
+            <a href="{{ url_for('ky_add_teacher') }}" class="btn btn-primary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-user-plus"></i> Yeni Danışman Öğretmen Ekle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_manage_teachers') }}" class="btn btn-info admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chalkboard-teacher"></i> Eklediğim Danışman Öğretmenleri Yönet
+            </a>
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <a href="{{ url_for('ky_add_competition_template') }}" class="btn btn-primary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-file-medical-alt"></i> Yeni Yarışma Şablonu Ekle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_manage_competition_templates') }}" class="btn btn-secondary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-tasks"></i> Yarışma Şablonlarını Yönet
+            </a>
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <a href="{{ url_for('ky_projects') }}" class="btn btn-primary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Projeleri Görüntüle ve Filtrele
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_reports') }}" class="btn btn-info admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Raporları Görüntüle (Yakında)
+            </a>
+        </div>
+        <hr class="my-4">
+        <div class="mb-3">
+            <a href="{{ url_for('ky_new_material') }}" class="btn btn-primary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Yeni Malzeme Ekle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_material_list') }}" class="btn btn-secondary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Malzeme Listesini Görüntüle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_material_requests') }}" class="btn btn-info admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> İstek Listeleri Görüntüle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_delivered_materials') }}" class="btn btn-secondary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Verilen Malzemeleri Görüntüle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('ky_external_material_requests') }}" class="btn btn-secondary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-chart-line"></i> Stok Dışı Malzeme Talepleri
+            </a>
+        </div>
+    </div>
+
+    <p class="mt-5">
+        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">&larr; Kontrol Paneline Dön</a>
+    </p>
+</div>
+
+{% endblock %} 

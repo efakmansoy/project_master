@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Paneli - Proje Yönetim Sistemi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Admin Paneli</h1>
+    <p class="mb-4">Hoş geldiniz, {{ current_user.username }}.</p>
+
+    <div class="admin-actions">
+        <div class="mb-3">
+            <a href="{{ url_for('add_kurum_yoneticisi') }}" class="btn btn-primary admin-action-btn btn-lg btn-block">
+                <i class="fas fa-user-plus"></i> Yeni Kurum Yöneticisi Ekle
+            </a>
+        </div>
+        <div class="mb-3">
+            <a href="{{ url_for('manage_users') }}" class="btn btn-info admin-action-btn btn-lg btn-block">
+                <i class="fas fa-users-cog"></i> Kullanıcıları Yönet
+            </a>
+        </div>
+        {# Add more admin actions here in the future, following the same pattern #}
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Danışman Öğretmen Detayları: {{ viewed_teacher.username }} - Kurum Yöneticisi Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="user-detail-header mb-4">
+        <h1>Danışman Öğretmen: {{ viewed_teacher.username }}</h1>
+        <p><strong>E-posta:</strong> {{ viewed_teacher.email }}</p>
+        <p><strong>Rol:</strong> Öğretmen</p>
+        {% if viewed_teacher.creator_id == current_user.id %}
+            <p><em>Bu öğretmen sizin tarafınızdan eklenmiştir.</em></p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h4>Danışmanı Olduğu Takımlar ve Öğrencileri</h4>
+    {% if advised_teams_with_students %}
+        {% for team_info in advised_teams_with_students %}
+            <div class="card mb-3">
+                <div class="card-header">
+                    <strong>Takım: {{ team_info.team.name }}</strong>
+                </div>
+                <div class="card-body">
+                    {% if team_info.students %}
+                        <h6 class="card-subtitle mb-2 text-muted">Öğrenciler:</h6>
+                        <ul class="list-group list-group-flush">
+                            {% for student in team_info.students %}
+                                <li class="list-group-item py-2">{{ student.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="card-text">Bu takımda kayıtlı öğrenci bulunmamaktadır.</p>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>{{ viewed_teacher.username }} henüz hiçbir takımın danışmanı değil veya takımlarında öğrenci yok.</p>
+    {% endif %}
+
+    <hr class="mt-4 mb-4">
+
+    <h4>Danışmanı Olduğu Takımların Projeleri</h4>
+    {% if teacher_projects %}
+        <div class="list-group">
+            {% for project in teacher_projects %}
+                <a href="{{ url_for('project_detail', project_id=project.id) }}" class="list-group-item list-group-item-action flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ project.name }}</h5>
+                        <small>Takım: {{ project.team.name }}</small>
+                    </div>
+                    <p class="mb-1">{{ project.description|truncate(150) }}</p>
+                    <small>İlerleme: {{ project.progress }}%</small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Bu öğretmenin danışman olduğu takımlarda henüz proje bulunmamaktadır.</p>
+    {% endif %}
+
+    <p class="mt-5">
+        <a href="{{ url_for('ky_manage_teachers') }}" class="btn btn-secondary">&larr; Öğretmen Yönetimine Dön</a>
+    </p>
+</div>
+{% endblock %} 

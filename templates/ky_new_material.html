@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Yeni Malzeme Girişi{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Yeni Malzeme Girişi</h1>
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-plus-circle me-1"></i>
+            Yeni Malzeme Ekleme Formu
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('ky_new_material') }}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Malzeme Adı</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Kategori</label>
+                    <input type="text" class="form-control" id="category" name="category" placeholder="Örn: Elektronik, Mekanik, Yazılım" required>
+                </div>
+                <div class="mb-3">
+                    <label for="quantity_in_stock" class="form-label">Stok Adedi</label>
+                    <input type="number" class="form-control" id="quantity_in_stock" name="quantity_in_stock" min="0" required>
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Açıklama</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Malzemeyi Kaydet</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %} 

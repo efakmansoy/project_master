@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proje Anketi: {{ project.name }}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f7f6; }
+        .survey-container {
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .survey-header {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container survey-container">
+        <div class="survey-header">
+            <h2>Proje Tamamlanma Anketi</h2>
+            <h4 class="text-muted">{{ project.name }}</h4>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('survey_page', token=project.survey_token) }}">
+            <div class="form-group">
+                <label for="respondent_name">Adınız Soyadınız <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="respondent_name" name="respondent_name" required>
+            </div>
+            <div class="form-group">
+                <label for="work_results">Bu projenin temel sonuçları ve çıktıları nelerdi? (Örn: Rapor, sunum, prototip vb.) <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="work_results" name="work_results" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="contribution">Projenin size ve takımınıza kişisel veya akademik olarak ne gibi katkıları oldu? <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="contribution" name="contribution" rows="4" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="suggestions">Proje süreci veya sonucuyla ilgili herhangi bir öneriniz veya eklemek istediğiniz bir yorum var mı?</label>
+                <textarea class="form-control" id="suggestions" name="suggestions" rows="4"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Anketi Gönder</button>
+        </form>
+    </div>
+</body>
+</html> 

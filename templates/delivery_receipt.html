@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Malzeme Teslim Tutanağı</title>
+    <style>
+        body { 
+            font-family: 'DejaVu Sans', sans-serif; /* Türkçe karakter desteği için */
+            line-height: 1.6;
+        }
+        .container { 
+            width: 90%; 
+            margin: auto; 
+        }
+        h1 { 
+            text-align: center; 
+            color: #333;
+            border-bottom: 2px solid #f2f2f2;
+            padding-bottom: 10px;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 25px; 
+            margin-bottom: 40px;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 12px; 
+            text-align: left; 
+        }
+        th { 
+            background-color: #f8f8f8; 
+            font-weight: bold;
+        }
+        .info-section p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+        .signatures { 
+            margin-top: 90px; 
+            width: 100%;
+            display: table;
+            table-layout: fixed;
+        }
+        .signature-box { 
+            display: table-cell;
+            width: 50%;
+            text-align: center; 
+        }
+        .signature-box .name {
+            font-weight: bold;
+        }
+        .signature-box .line { 
+            border-bottom: 1px solid #333; 
+            margin-top: 50px; 
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+        .signature-box .role {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Malzeme Teslim Tutanağı</h1>
+        
+        <div class="info-section">
+            <p><strong>Proje Adı:</strong> {{ request.project.name }}</p>
+            <p><strong>Talep Tarihi:</strong> {{ request.request_date.strftime('%d.%m.%Y') }}</p>
+            <p><strong>Teslim Tarihi:</strong> {{ today_date }}</p>
+        </div>
+
+        <hr>
+
+        <p>
+            Aşağıda listelenen malzemeler, <strong>{{ request.requester.student_info.student_class }}</strong> sınıfından, 
+            <strong>{{ request.requester.student_info.student_number }}</strong> numaralı öğrenci 
+            olan <strong>{{ request.requester.username }}</strong>'a tam ve eksiksiz olarak teslim edilmiştir.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Malzeme Adı</th>
+                    <th>Kategori</th>
+                    <th>Miktar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in request.items %}
+                <tr>
+                    <td>{{ item.material.name }}</td>
+                    <td>{{ item.material.category }}</td>
+                    <td>{{ item.quantity_requested }} adet</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="signatures">
+            <div class="signature-box">
+                <p class="name">{{ current_user.username }}</p>
+                <div class="line"></div>
+                <p class="role">Teslim Eden (Kurum Yöneticisi)</p>
+            </div>
+            <div class="signature-box">
+                <p class="name">{{ request.requester.username }}</p>
+                <div class="line"></div>
+                <p class="role">Teslim Alan (Öğrenci)</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

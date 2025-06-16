@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% block title %}Malzeme Talep Sistemi{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Malzeme Talebi: {{ project.name }}</h1>
+
+    <div class="row">
+        <!-- Available Materials Column -->
+        <div class="col-md-7">
+            <h3>Depodaki Malzemeler</h3>
+            <div class="list-group" id="material-list">
+                {% for material in materials %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ material.name }}</h5>
+                            <p class="mb-1 text-muted">{{ material.description or 'Açıklama yok' }}</p>
+                            <small>Stok: {{ material.quantity_in_stock }}</small>
+                        </div>
+                        <button class="btn btn-sm btn-success add"
+                                data-id="{{ material.id }}"
+                                data-name="{{ material.name }}">Sepete Ekle</button>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Depoda hiç malzeme bulunmuyor.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Cart and Request Form Column -->
+        <div class="col-md-5">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h3>Talep Sepeti</h3>
+                </div>
+                <div class="card-body">
+                    <form id="request-form" method="POST" action="{{ url_for('list_materials', project_id=project.id) }}">
+                        <ul class="list-group mb-3" id="cart-items">
+                            <!-- Cart items will be added here by JavaScript -->
+                        </ul>
+                        <p class="text-muted text-center" id="cart-placeholder">Sepetiniz boş.</p>
+                        <input type="hidden" name="cart" id="cart-data">
+                        <button type="submit" class="btn btn-primary w-100" id="submit-request" disabled>Talebi Onaya Gönder</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <h3>Malzeme Listesi</h3>
+            <p>Aşağıdaki listeden talep etmek istediğiniz malzemeleri seçin ve adetlerini belirtin.</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="{{ url_for('request_external_material', project_id=project.id) }}" class="btn btn-info">
+                <i class="fas fa-plus"></i> Stokta Olmayan Malzeme İste
+            </a>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="list-group" id="material-list">
+                {% for material in materials %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ material.name }}</h5>
+                            <p class="mb-1 text-muted">{{ material.description or 'Açıklama yok' }}</p>
+                            <small>Stok: {{ material.quantity_in_stock }}</small>
+                        </div>
+                        <button class="btn btn-sm btn-success add"
+                                data-id="{{ material.id }}"
+                                data-name="{{ material.name }}">Sepete Ekle</button>
+                    </div>
+                {% else %}
+                    <p class="text-muted">Depoda hiç malzeme bulunmuyor.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const cart = [];
+    const addToCartButtons = document.querySelectorAll('.add');
+    const cartItemsList = document.getElementById('cart-items');
+    const cartPlaceholder = document.getElementById('cart-placeholder');
+    const cartDataInput = document.getElementById('cart-data');
+    const submitButton = document.getElementById('submit-request');
+    console.log(addToCartButtons);
+    console.log("mer");
+    function updateCartDisplay() {
+        cartItemsList.innerHTML = ''; // Clear list
+        if (cart.length === 0) {
+            cartPlaceholder.style.display = 'block';
+            submitButton.disabled = true;
+        } else {
+            cartPlaceholder.style.display = 'none';
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>${item.name}</span>
+                    <div>
+                        <input type="number" value="${item.quantity}" min="1" class="form-control form-control-sm d-inline-block" style="width: 70px;" data-id="${item.id}">
+                        <button class="btn btn-sm btn-danger remove-from-cart" data-id="${item.id}">&times;</button>
+                    </div>
+                `;
+                cartItemsList.appendChild(li);
+            });
+            submitButton.disabled = false;
+        }
+        cartDataInput.value = JSON.stringify(cart);
+    }
+
+    addToCartButtons.forEach(button => {
+        console.log(button);
+        button.addEventListener('click', function() {
+            console.log(this.dataset.id);
+            const materialId = parseInt(this.dataset.id);
+            const materialName = this.dataset.name;
+
+            const existingItem = cart.find(item => item.id === materialId);
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({ id: materialId, name: materialName, quantity: 1 });
+            }
+            console.log(cart);
+            updateCartDisplay();
+        });
+    });
+
+    cartItemsList.addEventListener('change', function(e) {
+        if (e.target.tagName === 'INPUT' && e.target.type === 'number') {
+            const materialId = parseInt(e.target.dataset.id);
+            const newQuantity = parseInt(e.target.value);
+            const itemInCart = cart.find(item => item.id === materialId);
+
+            if (itemInCart) {
+                if (newQuantity > 0) {
+                    itemInCart.quantity = newQuantity;
+                } else {
+                    // Remove if quantity is 0 or less
+                    const itemIndex = cart.findIndex(item => item.id === materialId);
+                    cart.splice(itemIndex, 1);
+                }
+            }
+            updateCartDisplay();
+        }
+    });
+
+    cartItemsList.addEventListener('click', function(e) {
+        if (e.target.classList.contains('remove-from-cart')) {
+            const materialId = parseInt(e.target.dataset.id);
+            const itemIndex = cart.findIndex(item => item.id === materialId);
+            if (itemIndex > -1) {
+                cart.splice(itemIndex, 1);
+            }
+            updateCartDisplay();
+        }
+    });
+
+    updateCartDisplay(); // Initial call
+});
+</script>
+{% endblock %} 

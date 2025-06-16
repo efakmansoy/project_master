@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Malzeme Tanıma Aracı{% endblock %}
+
+{% block content %}
+<style>
+    #video-container {
+        position: relative;
+        display: inline-block;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #000;
+    }
+    #video {
+        display: block;
+        width: 100%;
+        max-width: 640px;
+        height: auto;
+    }
+    #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    #result-container {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-align: center;
+    }
+</style>
+
+<div class="text-center">
+    <h1 class="mb-4">Malzeme Tanıma Aracı</h1>
+    <p class="lead mb-4">Elektronik malzemeyi kameraya gösterin ve "Tanı" butonuna basın.</p>
+
+    <div id="video-container" class="mb-3">
+        <video id="video" playsinline autoplay muted></video>
+        <div id="overlay">Kamera Başlatılıyor...</div>
+    </div>
+    
+    <div>
+        <button id="recognize-btn" class="btn btn-primary btn-lg" disabled>
+            <i class="fas fa-camera"></i> Tanı
+        </button>
+    </div>
+
+    <div id="result-container" class="mt-4 p-3 bg-light rounded" style="min-height: 60px;">
+        <!-- Sonuç burada gösterilecek -->
+    </div>
+</div>
+
+<canvas id="canvas" style="display:none;"></canvas>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const recognizeBtn = document.getElementById('recognize-btn');
+    const resultContainer = document.getElementById('result-container');
+    const overlay = document.getElementById('overlay');
+
+    let stream;
+
+    // Kamera başlatma fonksiyonu
+    async function startCamera() {
+        try {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: 'environment' // Arka kamerayı tercih et
+                } 
+            });
+            video.srcObject = stream;
+            overlay.style.display = 'none';
+            recognizeBtn.disabled = false;
+        } catch (err) {
+            console.error("Kamera hatası: ", err);
+            overlay.innerHTML = `Kamera başlatılamadı. <br> Hata: ${err.name}`;
+            if (err.name === "NotAllowedError") {
+                 overlay.innerHTML += "<br>Lütfen kamera izni verin.";
+            } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+                 overlay.innerHTML += "<br>Uygun bir kamera bulunamadı.";
+            }
+        }
+    }
+
+    // "Tanı" butonuna tıklanınca
+    recognizeBtn.addEventListener('click', () => {
+        resultContainer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Tanımlanıyor...';
+        
+        // Canvas'ı video boyutuna ayarla
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Videodan bir kare çiz
+        const context = canvas.getContext('2d');
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Canvas'ı sunucuya göndermek için blob'a çevir
+        canvas.toBlob((blob) => {
+            const formData = new FormData();
+            formData.append('image', blob, 'capture.jpg');
+
+            fetch("{{ url_for('recognize_device') }}", {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    // CSRF token gibi ek başlıklar gerekirse buraya eklenebilir
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultContainer.textContent = `Hata: ${data.error}`;
+                } else {
+                    resultContainer.textContent = data.result || 'Tanımlanamadı';
+                }
+            })
+            .catch(error => {
+                console.error('Tanıma hatası:', error);
+                resultContainer.textContent = 'Bir hata oluştu. Lütfen tekrar deneyin.';
+            });
+
+        }, 'image/jpeg');
+    });
+
+    startCamera();
+});
+</script>
+{% endblock %} 
