@@ -1,0 +1,8 @@
+Flask>=2.0.0
+Flask-Login>=0.5.0
+Flask-Bcrypt>=1.0.0
+email-validator>=2.0.0 # Updated version 
+Authlib>=1.0.0 # For OAuth (Google, GitHub) 
+Flask-Mail>=0.9.1 # For sending emails 
+Flask-SQLAlchemy>=2.5.1 # Veritabanı yönetimi için 
+Flask-APScheduler==1.13.1
