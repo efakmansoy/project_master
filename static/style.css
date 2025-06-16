@@ -1,0 +1,740 @@
+body {
+    font-family: sans-serif;
+    margin: 0; /* Remove default margin */
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Navbar styling */
+.navbar {
+    background-color: #343a40;
+    padding: 10px 0;
+    color: white;
+    width: 100%; /* Make navbar full width */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.nav-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand {
+    font-size: 1.5em;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.nav-item {
+    margin-left: 20px;
+}
+
+.nav-item a {
+    color: #f8f9fa;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-item a:hover,
+.nav-item a.active {
+    background-color: #495057;
+    color: white;
+}
+
+.user-role {
+    color: #adb5bd;
+    font-size: 0.9em;
+    margin-right: 5px;
+    padding: 8px 0; /* Align with links */
+}
+
+/* General Container for content below navbar */
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto; /* Add margin from navbar */
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Flash messages styling */
+.flashes {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid transparent;
+    border-radius: .35rem; /* Slightly more pronounced radius */
+    position: relative;
+}
+
+.alert-success {
+    color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+.alert-danger {
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+.alert-info {
+    color: #055160;
+    background-color: #cff4fc;
+    border-color: #b6effb;
+}
+
+.alert-warning {
+    color: #664d03;
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+}
+
+/* Main content area within container */
+.content-main {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.075);
+}
+
+h1, h2 {
+    color: #333;
+    margin-top: 0; /* Remove default top margin for headings in content */
+}
+
+form div.form-group, /* Target only form-group divs inside forms */
+.form-group /* General class for spacing if used outside forms */
+{
+    margin-bottom: 1.25rem; /* Standardized spacing */
+}
+
+label {
+    display: block;
+    margin-bottom: .5rem; /* Standardized spacing */
+    font-weight: 500; /* Slightly less bold */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="email"],
+input[type="file"],
+input[type="date"],
+textarea,
+select.form-control /* Target select elements with form-control class */
+{
+    width: 100%;
+    padding: .75rem 1rem; /* Increased padding for better touch targets and visual */
+    border: 1px solid #ced4da; /* Softer border color */
+    border-radius: .25rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1.5;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+input[type="date"]:focus,
+textarea:focus,
+select.form-control:focus {
+    border-color: #86b7fe;
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .25);
+}
+
+textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+
+.btn-primary {
+    background-color: #0d6efd; /* Bootstrap primary blue */
+    color: white;
+    padding: .6rem 1.2rem;
+    border: 1px solid #0d6efd;
+    border-radius: .25rem;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    vertical-align: middle;
+    user-select: none; /* Prevent text selection */
+    transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+.btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+.btn-lg {
+    padding: .75rem 1.5rem;
+    font-size: 1.25rem;
+    border-radius: .3rem;
+}
+
+
+/* Form container styling (for login, signup) */
+.form-container {
+    background-color: #fff; /* Already in content-main, but can be specific */
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    max-width: 450px; /* Slightly narrower for focused forms */
+    margin: 40px auto;
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+    font-weight: 600;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem; /* Consistent spacing */
+}
+
+.form-check-input {
+    margin-right: .5rem;
+    width: auto; /* Override form-control width */
+    height: 1em; /* Align checkbox better */
+    vertical-align: middle;
+}
+
+.form-check-label {
+    margin-bottom: 0; /* Align with checkbox */
+    font-weight: normal;
+}
+
+.form-container p.mt-3 {
+    margin-top: 1.5rem; /* More space before "Don't have an account?" */
+    text-align: center;
+}
+
+/* Social Login Buttons */
+.social-login-divider {
+    max-width: 280px; /* Constrain width and center */
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-top: 20px; /* Explicitly set top/bottom margins */
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+}
+
+.social-login-divider::before,
+.social-login-divider::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background: #ced4da;
+    margin: 0 10px;
+}
+
+.social-login-buttons {
+    max-width: 280px; /* Constrain width of the button container */
+    margin-left: auto; /* Center the container */
+    margin-right: auto;
+    /* Buttons inside will be width:100% of this container due to .btn-block */
+}
+
+.social-login-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    font-size: 0.95rem;
+    text-decoration: none;
+}
+
+.social-login-buttons .btn img {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+}
+
+.btn-google {
+    background-color: #fff;
+    color: #495057;
+    border: 1px solid #ced4da;
+}
+
+.btn-google:hover {
+    background-color: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+/* GitHub button styles are removed from here */
+
+.btn-block {
+    width: 100%;
+}
+
+/* Welcome page specific styles */
+.welcome-container {
+    text-align: center;
+    padding: 40px 20px;
+    /* background-color: #fff; Applied by content-main */
+    /* border-radius: 8px; Applied by content-main */
+    /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); Applied by content-main */
+}
+
+.welcome-container h1 {
+    color: #0d6efd;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+.welcome-container p {
+    font-size: 1.1em;
+    color: #555;
+    line-height: 1.7;
+    max-width: 700px; /* Control line length */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-overview {
+    margin: 40px 0;
+    text-align: left;
+    display: inline-block;
+    padding: 20px;
+    background-color: #f8f9fa; /* Light background for this section */
+    border-radius: 6px;
+}
+
+.features-overview h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.features-overview ul {
+    list-style-type: disc;
+    padding-left: 25px;
+    margin-bottom: 0; /* Remove bottom margin from ul */
+}
+
+.features-overview ul li {
+    font-size: 1em;
+    color: #444;
+    margin-bottom: 10px;
+    border-bottom: none;
+    padding: 0;
+}
+
+.cta-buttons {
+    margin-top: 30px;
+}
+
+.cta-buttons .btn {
+    margin: 0 10px;
+}
+
+/* Project Listing (index.html) */
+.project-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.project-list li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.project-list li:hover {
+    background-color: #f1f1f1;
+}
+
+.project-list li a {
+    text-decoration: none;
+    color: #0d6efd;
+    font-weight: 500;
+    font-size: 1.1em;
+}
+
+.project-list li a:hover {
+    text-decoration: underline;
+}
+
+.project-list .project-progress {
+    font-size: 0.9em;
+    color: #555;
+}
+
+/* Project Detail Page */
+.project-detail-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.project-detail-header h1 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.project-detail-header p {
+    font-size: 1.1em;
+    color: #666;
+}
+
+.section-divider {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.file-list ul, .image-gallery-container ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.file-list li, .image-gallery-container li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+.file-list li:last-child, .image-gallery-container li:last-child {
+    border-bottom: none;
+}
+
+.file-list a {
+    text-decoration: none;
+}
+
+.image-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; /* Increased gap */
+}
+
+.image-gallery div {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    background-color: #fdfdfd;
+}
+
+.image-gallery img {
+    max-width: 180px; /* Slightly smaller for gallery view */
+    max-height: 180px;
+    height: auto;
+    display: block;
+    margin-top: 8px;
+    border-radius: 3px;
+}
+
+.image-gallery p {
+    font-size: 0.9em;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+/* Timeline styles */
+.timeline-section h3 {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.timeline-event {
+    border-left: 3px solid #0d6efd;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+.timeline-event strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-size: 1.1em;
+}
+
+.timeline-event.overdue strong {
+    color: #dc3545; /* Red for overdue timeline event dates */
+}
+
+.timeline-event.overdue {
+    border-left-color: #dc3545;
+    background-color: #fdf2f2; /* Lighter red background for overdue timeline event */
+}
+
+.timeline-event .event-meta {
+    font-size: 0.85em;
+    color: #777;
+    margin-top: 5px;
+}
+
+/* Task list specific styles */
+.tasks-section h3 {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    font-size: 1.4em;
+}
+
+.task-list {
+    margin-top: 15px;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #fff;
+    transition: background-color 0.2s ease;
+}
+
+.task-item:hover {
+    background-color: #f9f9f9;
+}
+
+.task-info {
+    flex-grow: 1;
+}
+
+.task-description {
+    margin-bottom: 5px;
+    font-size: 1.05em;
+}
+
+.task-meta {
+    font-size: 0.85em;
+    color: #666;
+}
+
+.task-item.completed .task-description {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+.task-item.completed {
+    background-color: #e9ecef; /* Light grey for completed tasks */
+    border-left: 4px solid #28a745; /* Green left border for completed */
+}
+
+.task-item.overdue {
+    background-color: #fff8f8; /* Very light red for overdue tasks */
+    border-left: 4px solid #dc3545; /* Red left border for overdue */
+}
+
+
+
+.status-overdue {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.status-completed {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: #007bff; /* Or a more neutral color if preferred */
+}
+
+.task-actions .btn {
+    padding: .25rem .5rem; /* Smaller buttons for actions */
+    font-size: .875rem;
+}
+
+/* Make specific inputs like progress bar a bit smaller */
+input[type="number"].progress-input {
+    width: 120px;
+    display: inline-block; /* To allow button next to it */
+    margin-right: 10px;
+}
+
+.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #0d6efd;
+    text-decoration: none;
+}
+.back-link:hover {
+    text-decoration: underline;
+}
+
+
+/* Footer styling */
+footer {
+    text-align: center;
+    padding: 25px 0;
+    margin-top: 50px; /* More space before footer */
+    color: #6c757d; /* Softer color */
+    border-top: 1px solid #dee2e6; /* Softer border */
+    font-size: 0.9em;
+}
+
+/* Responsive adjustments (basic) */
+@media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .nav-menu {
+        margin-top: 10px;
+        flex-direction: column;
+        width: 100%;
+    }
+    .nav-item {
+        margin-left: 0;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    .nav-item a {
+        display: block; /* Make links take full width */
+        text-align: left;
+    }
+    .form-container {
+        margin: 20px auto;
+        padding: 20px;
+    }
+    .cta-buttons .btn {
+        display: block;
+        width: 80%;
+        margin: 10px auto;
+    }
+}
+
+/* Admin Panel Button Styling */
+.admin-actions .admin-action-btn {
+    text-align: left; /* Align text and icon to the left */
+    padding: 15px 20px; /* More padding */
+    font-size: 1.1rem; /* Slightly larger font */
+    display: flex; /* For aligning icon and text */
+    align-items: center; /* Vertically align icon and text */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+
+.admin-actions .admin-action-btn i {
+    margin-right: 15px; /* Space between icon and text */
+    font-size: 1.5rem; /* Larger icon */
+}
+
+.admin-actions .admin-action-btn:hover {
+    transform: translateY(-3px); /* Slight lift on hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+}
+
+.admin-actions .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.admin-actions .btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+}
+
+.admin-actions .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.admin-actions .btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+}
+
+/* Ensuring table borders are visible if not already default for the theme */
+.table-bordered,
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid #dee2e6; /* Standard Bootstrap border color */
+}
+
+.table-hover tbody tr:hover {
+    background-color: rgba(0,0,0,.075); /* Standard hover effect */
+}
+
+.task-complete {
+    text-decoration: line-through;
+    color: #6c757d;
+}
+
+/* === Dropdown Width Fix === */
+/* This rule targets select elements within forms to ensure they are wide enough. */
+
+.form-control-file {
+    min-height: 55px !important;
+}
+/* General form control enhancements */
+select.form-control {
+    -webkit-appearance: menulist !important;
+    -moz-appearance: menulist !important;
+    appearance: menulist !important;
+    padding-right: 30px !important; /* Make space for dropdown arrow */
+}
+
+/* Ensure dropdowns are wide enough to show content */
+.form-group select.form-control {
+    min-height: 45px !important; /* Increased min-width and made it important */
+
+} 
+
+.btn-light {
+    margin-left: 10px;
+    margin-right: 0px;
+}
