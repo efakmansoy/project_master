@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .header { font-size: 24px; color: #ffc107; margin-bottom: 20px; }
+        .highlight { background-color: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 20px 0; }
+        .footer { font-size: 12px; color: #888; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Proje Hatırlatması</div>
+        <p>Merhaba {{ username }},</p>
+        <p>
+            <b>{{ project_name }}</b> adlı projenizde yaklaşan bir etkinlik bulunmaktadır.
+        </p>
+        <div class="highlight">
+            <p><b>Etkinlik:</b> {{ event_description }}</p>
+            <p><b>Tarih:</b> {{ event_date }}</p>
+        </div>
+        <p>Lütfen görevinizi zamanında tamamlamayı unutmayın.</p>
+        <div class="footer">
+            Bu e-posta, Proje Yönetim Sistemi tarafından otomatik olarak gönderilmiştir.
+        </div>
+    </div>
+</body>
+</html> 

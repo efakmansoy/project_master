@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 90%; max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .header { font-size: 24px; color: #007bff; margin-bottom: 20px; }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            margin: 20px 0;
+            background-color: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .footer { font-size: 12px; color: #888; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">Proje Tamamlandı!</div>
+        <p>Merhaba {{ username }},</p>
+        <p>
+            <b>{{ project_name }}</b> adlı proje başarıyla tamamlandı. Proje sürecine ve sonuçlarına dair
+            görüşlerinizi almak için kısa bir anket hazırladık.
+        </p>
+        <p>Geri bildirimleriniz, gelecekteki projelerin daha verimli olmasına yardımcı olacaktır.</p>
+        <a href="{{ survey_url }}" class="button">Anketi Doldurmak İçin Tıklayın</a>
+        <p>Eğer yukarıdaki düğme çalışmazsa, aşağıdaki linki kopyalayıp tarayıcınıza yapıştırabilirsiniz:</p>
+        <p><a href="{{ survey_url }}">{{ survey_url }}</a></p>
+        <p>Teşekkürler!</p>
+        <div class="footer">
+            Bu e-posta, Proje Yönetim Sistemi tarafından otomatik olarak gönderilmiştir.
+        </div>
+    </div>
+</body>
+</html> 
