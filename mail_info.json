@@ -1,9 +1,0 @@
-{
-    "MAIL_SERVER": "smtp.gmail.com",
-    "MAIL_PORT": 587,
-    "MAIL_USE_TLS": true,
-    "MAIL_USE_SSL": false,
-    "MAIL_USERNAME": "efakmansoy@gmail.com",
-    "MAIL_PASSWORD": "eqlv nwuj kbtr oczw",
-    "MAIL_DEFAULT_SENDER": ["ProjectMaster", "noreply@projectmaster.com"]
-}
