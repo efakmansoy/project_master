@@ -49,7 +49,7 @@ Bu web tabanlı uygulama, okullar veya kurumlar için proje takibi, takım yöne
 
 1.  **Depoyu Klonlayın:**
     ```bash
-    git clone https://github.com/kullanici-adiniz/proje-yonetim-sistemi.git
+    git clone https://github.com/efakmansoy/project_master.git
     cd proje-yonetim-sistemi
     ```
 
