@@ -68,7 +68,7 @@ Bu web tabanlı uygulama, okullar veya kurumlar için proje takibi, takım yöne
     ```
 
 4.  **Yapılandırma Dosyalarını Oluşturun:**
-    - `credentials.json`: Google OAuth ve Gemini API anahtarlarınızı bu dosyaya ekleyin. Örnek bir `credentials.json.example` dosyası oluşturulabilir.
+    - `credentials.json`: Google OAuth ve Gemini API anahtarlarınızı bu dosyaya ekleyin.
     - `mail_info.json`: E-posta sunucu bilgilerinizi (SMTP) bu dosyaya ekleyin.
 
 5.  **Veritabanını Oluşturun:**
